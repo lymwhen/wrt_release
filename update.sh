@@ -547,10 +547,10 @@ function update_script_priority() {
     fi
 
     # 更新mosdns服务的启动顺序
-    local mosdns_path="$BUILD_DIR/package/feeds/small8/luci-app-mosdns/root/etc/init.d/mosdns"
-    if [ -d "${mosdns_path%/*}" ] && [ -f "$mosdns_path" ]; then
-        sed -i 's/START=.*/START=92/g' "$mosdns_path"
-    fi
+    # local mosdns_path="$BUILD_DIR/package/feeds/small8/luci-app-mosdns/root/etc/init.d/mosdns"
+    # if [ -d "${mosdns_path%/*}" ] && [ -f "$mosdns_path" ]; then
+    #     sed -i 's/START=.*/START=92/g' "$mosdns_path"
+    # fi
 }
 
 function optimize_smartDNS() {
@@ -588,33 +588,33 @@ main() {
     change_dnsmasq2full
     chk_fullconenat
     fix_mk_def_depends
-    add_wifi_default_set
+    # add_wifi_default_set
     update_default_lan_addr
     remove_something_nss_kmod
     remove_affinity_script
     fix_build_for_openssl
-    update_ath11k_fw
+    # update_ath11k_fw
     # fix_mkpkg_format_invalid
     chanage_cpuusage
     update_tcping
     add_wg_chk
-    add_ax6600_led
+    # add_ax6600_led
     set_custom_task
     update_pw_ha_chk
     install_opkg_distfeeds
     update_nss_pbuf_performance
     set_build_signature
-    fix_compile_vlmcsd
+    # fix_compile_vlmcsd
     update_nss_diag
     update_menu_location
     fix_compile_coremark
     update_dnsmasq_conf
-    update_lucky
+    # update_lucky
     add_backup_info_to_sysupgrade
     install_feeds
     update_package "small8/sing-box"
     update_script_priority
-    optimize_smartDNS
+    # optimize_smartDNS
 }
 
 main "$@"
