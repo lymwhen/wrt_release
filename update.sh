@@ -560,6 +560,7 @@ function add_backup_info_to_sysupgrade() {
 /etc/AdGuardHome.yaml
 /etc/easytier
 /etc/lucky/
+/etc/config/argon
 EOF
     fi
 }
