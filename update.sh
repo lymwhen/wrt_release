@@ -99,7 +99,7 @@ remove_unwanted_packages() {
         "shadowsocksr-libev" "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter"
     )
     local small8_packages=(
-        "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-theme-argon" "luci-app-easytier"
+        "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-theme-argon" "luci-app-easytier" "ddns-go" "luci-app-ddns-go"
     )
 
     for pkg in "${luci_packages[@]}"; do
@@ -124,6 +124,9 @@ remove_unwanted_packages() {
 
     # 替换luci-app-easytier
     git clone https://github.com/lymwhen/luci-app-easytier -b main ./feeds/luci/applications/luci-app-easytier
+
+    # 替换luci-app-ddns-go
+    git clone https://github.com/sirpdboy/luci-app-ddns-go -b main ./feeds/luci/applications/luci-app-ddns-go
 
     # 临时放一下，清理脚本
     if [ -d "$BUILD_DIR/target/linux/qualcommax/base-files/etc/uci-defaults" ]; then
