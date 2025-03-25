@@ -99,7 +99,7 @@ remove_unwanted_packages() {
         "shadowsocksr-libev" "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter"
     )
     local small8_packages=(
-        "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-theme-argon"
+        "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-theme-argon" "luci-app-easytier"
     )
 
     for pkg in "${luci_packages[@]}"; do
@@ -119,7 +119,11 @@ remove_unwanted_packages() {
         \rm -rf ./package/istore
     fi
 
+    # 替换luci-theme-argon
     git clone https://github.com/lymwhen/luci-theme-argon -b master ./feeds/luci/themes/luci-theme-argon
+
+    # 替换luci-app-easytier
+    git clone https://github.com/lymwhen/luci-app-easytier -b main ./feeds/luci/applications/luci-app-easytier
 
     # 临时放一下，清理脚本
     if [ -d "$BUILD_DIR/target/linux/qualcommax/base-files/etc/uci-defaults" ]; then
