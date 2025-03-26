@@ -86,17 +86,17 @@ update_feeds() {
 
 remove_unwanted_packages() {
     local luci_packages=(
-        "luci-app-passwall" "luci-app-smartdns" "luci-app-ddns-go" "luci-app-rclone"
+        "luci-app-passwall" "luci-app-smartdns" "luci-app-rclone"
         "luci-app-ssr-plus" "luci-app-vssr" "luci-theme-argon" "luci-app-daed" "luci-app-dae"
         "luci-app-alist" "luci-app-argon-config" "luci-app-homeproxy" "luci-app-haproxy-tcp"
         "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
-        "smartdns" "mosdns" "adguardhome" "ddns-go" "naiveproxy" "shadowsocks-rust"
+        "smartdns" "mosdns" "adguardhome" "naiveproxy" "shadowsocks-rust"
         "sing-box" "v2ray-core" "v2ray-geodata" "v2ray-plugin" "tuic-client"
         "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs"
-        "shadowsocksr-libev" "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "ddns-scripts_dnspod"
+        "shadowsocksr-libev" "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter"
     )
     local small8_packages=(
         "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-theme-argon" "luci-app-easytier" "ddns-go" "luci-app-ddns-go"
@@ -126,10 +126,10 @@ remove_unwanted_packages() {
     git clone https://github.com/lymwhen/luci-app-easytier -b main ./feeds/luci/applications/luci-app-easytier
 
     # 添加ddns dnspod支持
-    mkdir -p $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
-    git clone https://github.com/coolsnowwolf/lede -b master $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
-    mv $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp/package/lean/ddns-scripts_dnspod ./feeds/packages/net/
-    rm -rf $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    # mkdir -p $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    # git clone https://github.com/coolsnowwolf/lede -b master $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    # mv $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp/package/lean/ddns-scripts_dnspod ./feeds/packages/net/
+    # rm -rf $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
     # git clone https://github.com/nixonli/ddns-scripts_dnspod -b master ./feeds/packages/net/ddns-scripts_dnspod
 
     # 临时放一下，清理脚本
@@ -150,7 +150,7 @@ install_small8() {
         naiveproxy shadowsocks-rust sing-box v2ray-core v2ray-geodata v2ray-geoview v2ray-plugin \
         tuic-client chinadns-ng ipt2socks tcping trojan-plus simple-obfs shadowsocksr-libev \
         luci-app-passwall alist luci-app-alist smartdns luci-app-smartdns v2dat mosdns luci-app-mosdns \
-        adguardhome luci-app-adguardhome ddns-go luci-app-ddns-go taskd luci-lib-xterm luci-lib-taskd \
+        adguardhome luci-app-adguardhome taskd luci-lib-xterm luci-lib-taskd \
         luci-app-store quickstart luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest \
         luci-theme-argon netdata luci-app-netdata lucky luci-app-lucky luci-app-openclash luci-app-homeproxy \
         luci-app-amlogic nikki luci-app-nikki tailscale luci-app-tailscale oaf open-app-filter luci-app-oaf \
