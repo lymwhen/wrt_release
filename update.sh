@@ -126,10 +126,11 @@ remove_unwanted_packages() {
     git clone https://github.com/lymwhen/luci-app-easytier -b main ./feeds/luci/applications/luci-app-easytier
 
     # 添加ddns dnspod支持
-    mkdir -p $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
-    git clone https://github.com/coolsnowwolf/lede -b master $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
-    mv $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp/package/lean/ddns-scripts_dnspod ./feeds/small8/
-    rm -rf $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    # mkdir -p $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    # git clone https://github.com/coolsnowwolf/lede -b master $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    # mv $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp/package/lean/ddns-scripts_dnspod ./feeds/small8/
+    # rm -rf $BUILD_DIR/tmp/ddns-scripts_dnspod-tmp
+    git clone https://github.com/nixonli/ddns-scripts_dnspod -b master ./feeds/packages/net/ddns-scripts_dnspod
 
     # 临时放一下，清理脚本
     if [ -d "$BUILD_DIR/target/linux/qualcommax/base-files/etc/uci-defaults" ]; then
