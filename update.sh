@@ -74,10 +74,11 @@ update_feeds() {
     fi
 
     # 切换nss-packages源
-    #if grep -q "nss_packages" "$BUILD_DIR/$FEEDS_CONF"; then
-    #    sed -i '/nss_packages/d' "$BUILD_DIR/$FEEDS_CONF"
-    #    echo "src-git nss_packages https://github.com/ZqinKing/nss-packages.git" >>"$BUILD_DIR/$FEEDS_CONF"
-    #fi
+    # if grep -q "nss_packages" "$BUILD_DIR/$FEEDS_CONF"; then
+    #     sed -i '/nss_packages/d' "$BUILD_DIR/$FEEDS_CONF"
+    #     [ -z "$(tail -c 1 "$BUILD_DIR/$FEEDS_CONF")" ] || echo "" >>"$BUILD_DIR/$FEEDS_CONF"
+    #     echo "src-git nss_packages https://github.com/LiBwrt/nss-packages.git" >>"$BUILD_DIR/$FEEDS_CONF"
+    # fi
 
     # 更新 feeds
     ./scripts/feeds clean
@@ -764,7 +765,7 @@ main() {
     update_default_lan_addr
     remove_something_nss_kmod
     update_affinity_script
-    fix_build_for_openssl
+    # fix_build_for_openssl
     update_ath11k_fw
     # fix_mkpkg_format_invalid
     chanage_cpuusage
@@ -793,7 +794,7 @@ main() {
     update_script_priority
     fix_easytier
     update_geoip
-    update_package "xray-core"
+    # update_package "xray-core"
     # update_proxy_app_menu_location
     # update_dns_app_menu_location
 }
