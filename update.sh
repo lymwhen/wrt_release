@@ -755,7 +755,7 @@ main() {
     reset_feeds_conf
     update_feeds
     remove_unwanted_packages
-    update_homeproxy
+#    update_homeproxy
     fix_default_set
     fix_miniupnpd
     update_golang
@@ -770,7 +770,7 @@ main() {
     # fix_mkpkg_format_invalid
     chanage_cpuusage
     update_tcping
-    add_ax6600_led
+#    add_ax6600_led
     set_custom_task
     update_pw
     install_opkg_distfeeds
