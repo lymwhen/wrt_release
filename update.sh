@@ -161,7 +161,7 @@ remove_unwanted_packages() {
     # fi
 
     # 替换luci-theme-argon
-    # git clone https://github.com/lymwhen/luci-theme-argon -b master ./feeds/luci/themes/luci-theme-argon
+    git clone https://github.com/lymwhen/luci-theme-argon -b master ./feeds/luci/themes/luci-theme-argon
 
     # 临时放一下，清理脚本
     if [ -d "$BUILD_DIR/target/linux/qualcommax/base-files/etc/uci-defaults" ]; then
