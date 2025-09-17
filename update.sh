@@ -114,7 +114,7 @@ remove_unwanted_packages() {
         "mosdns" "adguardhome" "ddns-go" "naiveproxy" "shadowsocks-rust"
         "sing-box" "v2ray-core" "v2ray-geodata" "v2ray-plugin" "tuic-client"
         "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs" "shadowsocksr-libev"
-        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite"
+        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite" "smartdns" "luci-app-smartdns"
     )
     local packages_utils=(
         "cups"
@@ -1032,7 +1032,7 @@ main() {
     add_quickfile
     update_lucky
     fix_rust_compile_error
-    update_smartdns
+    # update_smartdns
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
