@@ -107,7 +107,7 @@ remove_unwanted_packages() {
         "luci-app-passwall" "luci-app-ddns-go" "luci-app-rclone" "luci-app-ssr-plus"
         "luci-app-vssr" "luci-app-daed" "luci-app-dae" "luci-app-alist" "luci-app-homeproxy"
         "luci-app-haproxy-tcp" "luci-app-openclash" "luci-app-mihomo" "luci-app-appfilter"
-        "luci-app-msd_lite" "luci-theme-argon"
+        "luci-app-msd_lite"
     )
     local packages_net=(
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
@@ -159,9 +159,6 @@ remove_unwanted_packages() {
     # if grep -q "nss_packages" "$BUILD_DIR/$FEEDS_CONF"; then
     #     rm -rf "$BUILD_DIR/feeds/nss_packages/wwan"
     # fi
-
-    # 替换luci-theme-argon
-    git clone https://github.com/lymwhen/luci-theme-argon -b master ./feeds/luci/themes/luci-theme-argon
 
     # 临时放一下，清理脚本
     if [ -d "$BUILD_DIR/target/linux/qualcommax/base-files/etc/uci-defaults" ]; then
@@ -972,7 +969,7 @@ remove_tweaked_packages() {
 }
 
 update_argon() {
-    local repo_url="https://github.com/ZqinKing/luci-theme-argon.git"
+    local repo_url="https://github.com/lymwhen/luci-theme-argon.git"
     local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-argon"
     local tmp_dir
     tmp_dir=$(mktemp -d)
