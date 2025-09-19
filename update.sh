@@ -640,7 +640,6 @@ function add_backup_info_to_sysupgrade() {
 /etc/AdGuardHome.yaml
 /etc/easytier
 /etc/lucky/
-/etc/config/argon
 EOF
     fi
 }
@@ -989,6 +988,27 @@ update_argon() {
     echo "luci-theme-argon 更新完成"
 }
 
+update_wolplus() {
+    local repo_url="https://github.com/lymwhen/luci-app-wolplus.git"
+    local dst_path="$BUILD_DIR/feeds/luci/applications/luci-app-wolplus"
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    echo "正在更新 wolplus..."
+
+    if ! git clone --depth 1 "$repo_url" "$tmp_dir"; then
+        echo "错误：从 $repo_url 克隆 wolplus 仓库失败" >&2
+        rm -rf "$tmp_dir"
+        exit 1
+    fi
+
+    rm -rf "$dst_path"
+    rm -rf "$tmp_dir/.git"
+    mv "$tmp_dir" "$dst_path"
+
+    echo "luci-app-wolplus 更新完成"
+}
+
 main() {
     clone_repo
     clean_up
@@ -1034,6 +1054,7 @@ main() {
     set_nginx_default_config
     update_uwsgi_limit_as
     update_argon
+    update_wolplus
     install_feeds
     support_fw4_adg
     update_script_priority
