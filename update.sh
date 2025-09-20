@@ -113,8 +113,8 @@ remove_unwanted_packages() {
         "haproxy" "xray-core" "xray-plugin" "dns2socks" "alist" "hysteria"
         "mosdns" "adguardhome" "ddns-go" "naiveproxy" "shadowsocks-rust"
         "sing-box" "v2ray-core" "v2ray-geodata" "v2ray-plugin" "tuic-client"
-        "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs" "shadowsocksr-libev"
-        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite" "smartdns" "luci-app-smartdns"
+        "chinadns-ng" "ipt2socks" "tcping" "trojan-plus" "simple-obfs" "shadowsocksr-libev" 
+        "dae" "daed" "mihomo" "geoview" "tailscale" "open-app-filter" "msd_lite"
     )
     local packages_utils=(
         "cups"
@@ -321,17 +321,17 @@ fix_hash_value() {
 
 # 应用所有哈希值修正
 apply_hash_fixes() {
-    fix_hash_value \
-        "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
-        "a7edb052fea61418c91c7a052f7eb1478fe6d844aec5e3eda0f2fcf82de29a10" \
-        "b11e175970e08115fe3b0d7a543fa8d3a6239d3c24eeecfd8cfd2fef3f52c6c9" \
-        "smartdns"
+    #fix_hash_value \
+    #    "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+    #    "a7edb052fea61418c91c7a052f7eb1478fe6d844aec5e3eda0f2fcf82de29a10" \
+    #    "b11e175970e08115fe3b0d7a543fa8d3a6239d3c24eeecfd8cfd2fef3f52c6c9" \
+    #    "smartdns"
 
-    fix_hash_value \
-        "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
-        "a1c084dcc4fb7f87641d706b70168fc3c159f60f37d4b7eac6089ae68f0a18a1" \
-        "ab7d303a538871ae4a70ead2e90d35e24fcc36bc20f5b6c5d963a3e283ea43b1" \
-        "smartdns"
+    #fix_hash_value \
+    #    "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+    #    "a1c084dcc4fb7f87641d706b70168fc3c159f60f37d4b7eac6089ae68f0a18a1" \
+    #    "ab7d303a538871ae4a70ead2e90d35e24fcc36bc20f5b6c5d963a3e283ea43b1" \
+    #    "smartdns"
 }
 
 update_ath11k_fw() {
@@ -1049,7 +1049,7 @@ main() {
     add_quickfile
     update_lucky
     fix_rust_compile_error
-    # update_smartdns
+    update_smartdns
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
@@ -1064,7 +1064,7 @@ main() {
     update_package "containerd" "releases" "v1.7.27"
     update_package "docker" "tags" "v28.2.2"
     update_package "dockerd" "releases" "v28.2.2"
-    apply_hash_fixes # 调用哈希修正函数
+    # apply_hash_fixes # 调用哈希修正函数
 }
 
 main "$@"
