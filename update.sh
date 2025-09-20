@@ -121,7 +121,7 @@ remove_unwanted_packages() {
     )
     local small8_packages=(
         "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-app-alist"
-        "alist" "opkg" "smartdns" "luci-app-smartdns"
+        "alist" "opkg"
     )
 
     for pkg in "${luci_packages[@]}"; do
@@ -1034,7 +1034,7 @@ main() {
     add_quickfile
     update_lucky
     fix_rust_compile_error
-    update_smartdns
+    # update_smartdns
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
