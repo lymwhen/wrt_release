@@ -734,12 +734,12 @@ add_gecoosac() {
     fi
 }
 
-fix_easytier() {
-    local easytier_path="$BUILD_DIR/package/feeds/small8/luci-app-easytier/luasrc/model/cbi/easytier.lua"
-    if [ -d "${easytier_path%/*}" ] && [ -f "$easytier_path" ]; then
-        sed -i 's/util/xml/g' "$easytier_path"
-    fi
-}
+# fix_easytier() {
+#     local easytier_path="$BUILD_DIR/package/feeds/small8/luci-app-easytier/luasrc/model/cbi/easytier.lua"
+#     if [ -d "${easytier_path%/*}" ] && [ -f "$easytier_path" ]; then
+#         sed -i 's/util/xml/g' "$easytier_path"
+#     fi
+# }
 
 update_geoip() {
     local geodata_path="$BUILD_DIR/package/feeds/small8/v2ray-geodata/Makefile"
@@ -1043,7 +1043,7 @@ main() {
     install_feeds
     support_fw4_adg
     update_script_priority
-    fix_easytier
+    # fix_easytier
     update_geoip
     update_package "runc" "releases" "v1.2.6"
     update_package "containerd" "releases" "v1.7.27"
