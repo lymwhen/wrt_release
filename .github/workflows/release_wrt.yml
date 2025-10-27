@@ -18,6 +18,7 @@ on:
           - jdcloud_ipq60xx_libwrt_nowifi_mini
           - jdcloud_ipq60xx_libwrt_wifi_mini
           - n1_immwrt
+          - qihoo_360v6_immwrt
           - redmi_ax5_immwrt
           - redmi_ax6_immwrt
           - redmi_ax6_libwrt

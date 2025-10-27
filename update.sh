@@ -121,7 +121,7 @@ remove_unwanted_packages() {
     )
     local small8_packages=(
         "ppp" "firewall" "dae" "daed" "daed-next" "libnftnl" "nftables" "dnsmasq" "luci-app-alist"
-        "alist" "opkg"
+        "alist" "opkg" "smartdns" "luci-app-smartdns"
     )
 
     for pkg in "${luci_packages[@]}"; do
@@ -198,6 +198,30 @@ install_fullconenat() {
     fi
 }
 
+check_default_settings() {
+    local settings_dir="$BUILD_DIR/package/emortal/default-settings"
+    if [ ! -d "$settings_dir" ]; then
+        echo "目录 $settings_dir 不存在，正在从 immortalwrt 仓库克隆..."
+        local tmp_dir
+        tmp_dir=$(mktemp -d)
+        if git clone --depth 1 --filter=blob:none --sparse https://github.com/immortalwrt/immortalwrt.git "$tmp_dir"; then
+            pushd "$tmp_dir" > /dev/null
+            git sparse-checkout set package/emortal/default-settings
+            # 确保目标父目录存在
+            mkdir -p "$(dirname "$settings_dir")"
+            # 移动 default-settings 目录
+            mv package/emortal/default-settings "$settings_dir"
+            popd > /dev/null
+            rm -rf "$tmp_dir"
+            echo "default-settings 克隆并移动成功。"
+        else
+            echo "错误：克隆 immortalwrt 仓库失败" >&2
+            rm -rf "$tmp_dir"
+            exit 1
+        fi
+    fi
+}
+
 install_feeds() {
     ./scripts/feeds update -i
     for dir in $BUILD_DIR/feeds/*; do
@@ -219,8 +243,9 @@ fix_default_set() {
         find "$BUILD_DIR/feeds/luci/collections/" -type f -name "Makefile" -exec sed -i "s/luci-theme-bootstrap/luci-theme-$THEME_SET/g" {} \;
     fi
 
-    install -Dm755 "$BASE_PATH/patches/990_set_argon_primary" "$BUILD_DIR/package/base-files/files/etc/uci-defaults/990_set_argon_primary"
-    install -Dm755 "$BASE_PATH/patches/991_custom_settings" "$BUILD_DIR/package/base-files/files/etc/uci-defaults/991_custom_settings"
+    install -Dm544 "$BASE_PATH/patches/990_set_argon_primary" "$BUILD_DIR/package/base-files/files/etc/uci-defaults/990_set_argon_primary"
+    install -Dm544 "$BASE_PATH/patches/991_custom_settings" "$BUILD_DIR/package/base-files/files/etc/uci-defaults/991_custom_settings"
+    install -Dm544 "$BASE_PATH/patches/992_set-wifi-uci.sh" "$BUILD_DIR/package/base-files/files/etc/uci-defaults/992_set-wifi-uci.sh"
 
     if [ -f "$BUILD_DIR/package/emortal/autocore/files/tempinfo" ]; then
         if [ -f "$BASE_PATH/patches/tempinfo" ]; then
@@ -248,17 +273,6 @@ fix_mk_def_depends() {
     sed -i 's/libustream-mbedtls/libustream-openssl/g' $BUILD_DIR/include/target.mk 2>/dev/null
     if [ -f $BUILD_DIR/target/linux/qualcommax/Makefile ]; then
         sed -i 's/wpad-openssl/wpad-mesh-openssl/g' $BUILD_DIR/target/linux/qualcommax/Makefile
-    fi
-}
-
-add_wifi_default_set() {
-    local qualcommax_uci_dir="$BUILD_DIR/target/linux/qualcommax/base-files/etc/uci-defaults"
-    local filogic_uci_dir="$BUILD_DIR/target/linux/mediatek/filogic/base-files/etc/uci-defaults"
-    if [ -d "$qualcommax_uci_dir" ]; then
-        install -Dm755 "$BASE_PATH/patches/992_set-wifi-uci.sh" "$qualcommax_uci_dir/992_set-wifi-uci.sh"
-    fi
-    if [ -d "$filogic_uci_dir" ]; then
-        install -Dm755 "$BASE_PATH/patches/992_set-wifi-uci.sh" "$filogic_uci_dir/992_set-wifi-uci.sh"
     fi
 }
 
@@ -317,6 +331,21 @@ fix_hash_value() {
         sed -i "s/$old_hash/$new_hash/g" "$makefile_path"
         echo "已修正 $package_name 的哈希值。"
     fi
+}
+
+# 应用所有哈希值修正
+apply_hash_fixes() {
+    fix_hash_value \
+        "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+        "860a816bf1e69d5a8a2049483197dbebe8a3da2c9b05b2da68c85ef7dee7bdde" \
+        "582021891808442b01f551bc41d7d95c38fb00c1ec78a58ac3aaaf898fbd2b5b" \
+        "smartdns"
+
+    fix_hash_value \
+        "$BUILD_DIR/package/feeds/packages/smartdns/Makefile" \
+        "320c99a65ca67a98d11a45292aa99b8904b5ebae5b0e17b302932076bf62b1ec" \
+        "43e58467690476a77ce644f9dc246e8a481353160644203a1bd01eb09c881275" \
+        "smartdns"
 }
 
 update_ath11k_fw() {
@@ -699,17 +728,6 @@ EOF
     fi
 }
 
-support_fw4_adg() {
-    local src_path="$BASE_PATH/patches/AdGuardHome"
-    local dst_path="$BUILD_DIR/package/feeds/small8/luci-app-adguardhome/root/etc/init.d/AdGuardHome"
-    # 验证源路径是否文件存在且是文件，目标路径目录存在且脚本路径合法
-    if [ -f "$src_path" ] && [ -d "${dst_path%/*}" ] && [ -f "$dst_path" ]; then
-        # 使用 install 命令替代 cp 以确保权限和备份处理
-        install -Dm 755 "$src_path" "$dst_path"
-        echo "已更新AdGuardHome启动脚本"
-    fi
-}
-
 add_timecontrol() {
     local timecontrol_dir="$BUILD_DIR/package/luci-app-timecontrol"
     local repo_url="https://github.com/sirpdboy/luci-app-timecontrol.git"
@@ -734,12 +752,18 @@ add_gecoosac() {
     fi
 }
 
-# fix_easytier() {
-#     local easytier_path="$BUILD_DIR/package/feeds/small8/luci-app-easytier/luasrc/model/cbi/easytier.lua"
-#     if [ -d "${easytier_path%/*}" ] && [ -f "$easytier_path" ]; then
-#         sed -i 's/util/xml/g' "$easytier_path"
-#     fi
-# }
+update_adguardhome() {
+    local adguardhome_dir="$BUILD_DIR/package/feeds/small8/luci-app-adguardhome"
+    local repo_url="https://github.com/ZqinKing/luci-app-adguardhome.git"
+
+    echo "正在更新 luci-app-adguardhome..."
+    rm -rf "$adguardhome_dir" 2>/dev/null
+
+    if ! git clone --depth 1 "$repo_url" "$adguardhome_dir"; then
+        echo "错误：从 $repo_url 克隆 luci-app-adguardhome 仓库失败" >&2
+        exit 1
+    fi
+}
 
 update_geoip() {
     local geodata_path="$BUILD_DIR/package/feeds/small8/v2ray-geodata/Makefile"
@@ -807,7 +831,7 @@ fix_rust_compile_error() {
 
 update_smartdns() {
     # smartdns 仓库地址
-    local SMARTDNS_REPO="https://github.com/pymumu/openwrt-smartdns.git"
+    local SMARTDNS_REPO="https://github.com/ZqinKing/openwrt-smartdns.git"
     local SMARTDNS_DIR="$BUILD_DIR/feeds/packages/net/smartdns"
     # luci-app-smartdns 仓库地址
     local LUCI_APP_SMARTDNS_REPO="https://github.com/pymumu/luci-app-smartdns.git"
@@ -923,6 +947,16 @@ EOF
 \tclient_body_temp_path /mnt/tmp;" "$nginx_template"
         fi
     fi
+
+    local luci_support_script="$BUILD_DIR/feeds/packages/net/nginx/files-luci-support/60_nginx-luci-support"
+
+    if [ -f "$luci_support_script" ]; then
+        # 检查是否已经为 ubus location 应用了修复
+        if ! grep -q "client_body_in_file_only off;" "$luci_support_script"; then
+            echo "正在为 Nginx ubus location 配置应用修复..."
+            sed -i "/ubus_parallel_req 2;/a\\        client_body_in_file_only off;\\n        client_max_body_size 1M;" "$luci_support_script"
+        fi
+    fi
 }
 
 update_uwsgi_limit_as() {
@@ -994,6 +1028,30 @@ update_wolplus() {
     echo "luci-app-wolplus 更新完成"
 }
 
+fix_easytier_lua() {
+    local file_path="$BUILD_DIR/package/feeds/small8/luci-app-easytier/luasrc/model/cbi/easytier.lua"
+    if [ -f "$file_path" ]; then
+        sed -i 's/util.pcdata/xml.pcdata/g' "$file_path"
+    fi
+}
+
+# 更新 nginx-mod-ubus 模块
+update_nginx_ubus_module() {
+    local makefile_path="$BUILD_DIR/feeds/packages/net/nginx/Makefile"
+    local source_date="2024-03-02"
+    local source_version="564fa3e9c2b04ea298ea659b793480415da26415"
+    local mirror_hash="92c9ab94d88a2fe8d7d1e8a15d15cfc4d529fdc357ed96d22b65d5da3dd24d7f"
+
+    if [ -f "$makefile_path" ]; then
+        sed -i "s/SOURCE_DATE:=2020-09-06/SOURCE_DATE:=$source_date/g" "$makefile_path"
+        sed -i "s/SOURCE_VERSION:=b2d7260dcb428b2fb65540edb28d7538602b4a26/SOURCE_VERSION:=$source_version/g" "$makefile_path"
+        sed -i "s/MIRROR_HASH:=515bb9d355ad80916f594046a45c190a68fb6554d6795a54ca15cab8bdd12fda/MIRROR_HASH:=$mirror_hash/g" "$makefile_path"
+        echo "已更新 nginx-mod-ubus 模块的 SOURCE_DATE, SOURCE_VERSION 和 MIRROR_HASH。"
+    else
+        echo "错误：未找到 $makefile_path 文件，无法更新 nginx-mod-ubus 模块。" >&2
+    fi
+}
+
 main() {
     clone_repo
     clean_up
@@ -1007,7 +1065,6 @@ main() {
     update_golang
     change_dnsmasq2full
     fix_mk_def_depends
-    add_wifi_default_set
     update_default_lan_addr
     remove_something_nss_kmod
     update_affinity_script
@@ -1018,7 +1075,6 @@ main() {
 #    add_ax6600_led
     set_custom_task
     apply_passwall_tweaks
-    install_opkg_distfeeds
     update_nss_pbuf_performance
     set_build_signature
     update_nss_diag
@@ -1034,16 +1090,19 @@ main() {
     add_quickfile
     update_lucky
     fix_rust_compile_error
-    # update_smartdns
+    update_smartdns
     update_diskman
     set_nginx_default_config
     update_uwsgi_limit_as
     update_argon
     update_wolplus
+    update_nginx_ubus_module # 更新 nginx-mod-ubus 模块
+    check_default_settings
+    install_opkg_distfeeds
     install_feeds
-    support_fw4_adg
+    fix_easytier_lua
+    update_adguardhome
     update_script_priority
-    # fix_easytier
     update_geoip
     update_package "runc" "releases" "v1.2.6"
     update_package "containerd" "releases" "v1.7.27"
