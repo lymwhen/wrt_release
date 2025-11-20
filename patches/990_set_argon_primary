@@ -5,7 +5,8 @@ if [ ! -f /etc/config/argon ]; then
     uci add argon global
 fi
 
-uci set argon.@global[0].primary='#6A89CC'
+# primary设置会导致argon_theme设置冲突
+# uci set argon.@global[0].primary='#6A89CC'
 uci set argon.@global[0].transparency='0.1'
 uci set argon.@global[0].blur='8'
 uci commit argon
