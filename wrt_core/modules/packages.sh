@@ -155,7 +155,7 @@ install_custom_feed() {
         luci-app-quickstart luci-app-istorex luci-app-cloudflarespeedtest netdata luci-app-netdata \
         lucky luci-app-lucky luci-app-openclash luci-app-homeproxy luci-app-amlogic \
         oaf open-app-filter luci-app-oaf easytier luci-app-easytier \
-        msd_lite luci-app-msd_lite cups luci-app-cupsd
+        msd_lite luci-app-msd_lite cups luci-app-cupsd luci-app-argon-config
     )
     local required_feed_dirs=(
         cups tcping v2ray-geodata luci-lib-taskd luci-app-openclash
@@ -547,7 +547,7 @@ add_quickfile() {
 }
 
 update_argon() {
-    local repo_url="https://github.com/ZqinKing/luci-theme-argon.git"
+    local repo_url="https://github.com/lymwhen/luci-theme-argon.git"
     local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-argon"
     local tmp_dir
     tmp_dir=$(mktemp -d)
@@ -565,6 +565,27 @@ update_argon() {
     mv "$tmp_dir" "$dst_theme_path"
 
     echo "luci-theme-argon 更新完成"
+}
+
+update_wolplus() {
+    local repo_url="https://github.com/lymwhen/luci-app-wolplus.git"
+    local dst_path="$BUILD_DIR/feeds/luci/applications/luci-app-wolplus"
+    local tmp_dir
+    tmp_dir=$(mktemp -d)
+
+    echo "正在更新 wolplus..."
+
+    if ! git clone --depth 1 "$repo_url" "$tmp_dir"; then
+        echo "错误：从 $repo_url 克隆 wolplus 仓库失败" >&2
+        rm -rf "$tmp_dir"
+        exit 1
+    fi
+
+    rm -rf "$dst_path"
+    rm -rf "$tmp_dir/.git"
+    mv "$tmp_dir" "$dst_path"
+
+    echo "luci-app-wolplus 更新完成"
 }
 
 remove_attendedsysupgrade() {
