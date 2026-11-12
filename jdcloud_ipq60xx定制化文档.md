@@ -202,6 +202,7 @@ CONFIG_FRAGMENTS=nss,proxy
 - 保留 EasyTier、Zerotier、WolPlus 和无 WiFi 精简配置
 - 默认主题切换为 Vantage，移除 Argon 主题源和相关初始化补丁
 - 不引入 NetWiz，继续保留 quickstart/store/istorex 软件包源与修复逻辑
+- 修正 Vantage 主题安装路径为 `$BUILD_DIR/feeds/...`，避免写入根目录 `/feeds`
 
 ---
 
