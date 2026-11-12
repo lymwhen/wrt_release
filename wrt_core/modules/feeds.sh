@@ -24,6 +24,7 @@ update_feeds() {
     FEEDS_PATH=$(get_feeds_path)
     sed -i '/^#/d' "$FEEDS_PATH"
     sed -i '/packages_ext/d' "$FEEDS_PATH"
+    sed -i '/video/d' "$FEEDS_PATH"
     sed -i '/[[:space:]]small8[[:space:]]/d' "$FEEDS_PATH"
     sed -i '/[[:space:]]custom_feed[[:space:]]/d' "$FEEDS_PATH"
 
@@ -40,4 +41,5 @@ update_feeds() {
 install_feeds() {
     network_retry ./scripts/feeds update -i
     ./scripts/feeds install -a -f
+    ./scripts/feeds install -f luci-theme-vantage luci-app-vantage
 }

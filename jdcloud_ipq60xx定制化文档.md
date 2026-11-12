@@ -48,11 +48,14 @@ wrt_release/
 - 阿里云：AP8220
 - 领势：MX4200v1、MX4200v2、MX4300
 - 奇虎：360v6
-- 红米：AX5、AX6、AX6000
+- 红米：AX5、AX6
 - CMCC：RAX3000M
 - 斐讯：N1
 - 兆能：M2
 - Gemtek：W1701K
+- Cudy：TR3000
+- Nokia：040G-MD
+- SuperGateway：S20M
 - X64
 
 ### 上游软件包配置
@@ -69,6 +72,8 @@ wrt_release/
 3. **Openwrt-Passwall/openwrt-passwall** - Passwall 科学上网工具
 4. **nikkinikki-org/OpenWrt-nikki** - Nikki 科学上网工具
 5. **adminchenyu/eMMC-Health** - eMMC 健康监控
+6. **huchd0/luci-app-netwiz** - 上游新增的网络向导（本项目按定制优先不引入）
+7. **rchen14b/luci-app-airoha-npu** - Airoha NPU 支持
 
 ### 上游配置片段系统
 
@@ -167,21 +172,36 @@ CONFIG_FRAGMENTS=nss,proxy
 
 ### 4. 保持本项目已有的定制化
 
-本项目已有的定制化内容已保留：
+本项目已有的定制化内容已保留，并根据本次 upstream 跟进调整主题：
 
-#### 新增的软件包
-- `luci-app-argon-config` - Argon 主题配置（添加到 custom_feed）
-- `luci-app-wolplus` - 网络唤醒工具（新增函数 update_wolplus）
+#### 保留的软件包
+- `luci-app-wolplus` - 网络唤醒工具（保留 `update_wolplus`）
+- `quickstart`、`luci-app-quickstart`、`luci-app-store`、`luci-app-istorex` - 保留现有软件包源和修复逻辑
 
-#### 修改的配置
-- `compile_base.config` - 将 `luci-app-mosdns` 从 y 改为 n
+#### 主题调整
+- 默认主题由 Argon 切换为 Vantage
+- 使用 `anothaDev/luci-theme-vantage` 提供 `luci-theme-vantage` 与 `luci-app-vantage`
+- 移除 Argon 主题源、`luci-app-argon-config` 和 `990_set_argon_primary`
 
-#### 修改的主题源
-- Argon 主题从 `ZqinKing/luci-theme-argon` 改为 `lymwhen/luci-theme-argon`
+#### 不引入的软件包
+- 不引入 `luci-app-netwiz` 和 `luci-i18n-netwiz-zh-cn`
+- 不同步 `huchd0/luci-app-netwiz`，避免替换现有 quickstart/store/istorex 定制
 
 #### 新增的配置文件
 - `jdcloud_ipq60xx_immwrt_nowifi_mini.config` - 无 WiFi 精简版配置
 - `jdcloud_ipq60xx_immwrt_mini.config` - 精简版配置
+
+---
+
+## 变更记录
+
+### 2026-11-12：跟进 upstream/main
+
+- 合并至 upstream/main `0624835`，包括新设备配置、Passwall/SmartDNS 修复、miniupnpd 同步和 Lucky 3.4.1
+- 保留 `jdcloud_ipq60xx_immwrt_mini` 与 `jdcloud_ipq60xx_immwrt_nowifi_mini` 定制配置
+- 保留 EasyTier、Zerotier、WolPlus 和无 WiFi 精简配置
+- 默认主题切换为 Vantage，移除 Argon 主题源和相关初始化补丁
+- 不引入 NetWiz，继续保留 quickstart/store/istorex 软件包源与修复逻辑
 
 ---
 
