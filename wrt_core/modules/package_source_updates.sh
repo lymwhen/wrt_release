@@ -240,8 +240,8 @@ add_quickfile() {
 
 update_vantage() {
     local repo_url="https://github.com/anothaDev/luci-theme-vantage.git"
-    local dst_theme_path="$BUILD_DIR/feeds/luci/themes/luci-theme-vantage"
-    local dst_app_path="$BUILD_DIR/feeds/luci/applications/luci-app-vantage"
+    local dst_theme_path="/feeds/luci/themes/luci-theme-vantage"
+    local dst_app_path="/feeds/luci/applications/luci-app-vantage"
     local tmp_dir
     local commit_hash
     tmp_dir=$(mktemp -d)
