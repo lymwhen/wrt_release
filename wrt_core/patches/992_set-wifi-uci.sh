@@ -2,6 +2,23 @@
 
 board_name=$(cat /tmp/sysinfo/board_name)
 
+ensure_wifi_config() {
+	# A no-WiFi image removes /etc/config/wireless. Regenerate the detected
+	# radios before applying the board defaults when a WiFi image is flashed
+	# back over it. This is idempotent for existing radios and also restores
+	# a missing radio on multi-radio boards.
+	[ -x /sbin/wifi ] && /sbin/wifi config
+}
+
+has_custom_wifi() {
+	local radio=$1
+	local now_encryption=$(uci -q get wireless.default_radio${radio}.encryption)
+	local now_ssid=$(uci -q get wireless.default_radio${radio}.ssid)
+
+	[ -n "$now_encryption" ] && [ "$now_encryption" != "none" ] &&
+		[ -n "$now_ssid" ] && [ "$now_ssid" != "OWRT" ]
+}
+
 configure_wifi() {
 	local radio=$1
 	local channel=$2
@@ -10,8 +27,7 @@ configure_wifi() {
 	local ssid=$5
 	local key=$6
 	local encryption=${7:-"psk2+ccmp"} # 新增 encryption 参数，如果为空则默认为 psk2+ccmp
-	local now_encryption=$(uci get wireless.default_radio${radio}.encryption)
-	if [ -n "$now_encryption" ] && [ "$now_encryption" != "none" ]; then
+	if has_custom_wifi "$radio"; then
 		return 0
 	fi
 	uci -q batch <<EOF
@@ -43,11 +59,13 @@ configure_wifi7() {
 	local key=$6
 	local encryption=${7:-"psk2"} # 新增 encryption 参数，如果为空则默认为 psk2
 	local now_encryption=$(uci -q get wireless.default_radio${radio}.encryption)
+	local now_ssid=$(uci -q get wireless.default_radio${radio}.ssid)
 	local bandmode=$(uci -q get wireless.radio${radio}.band)
 	if [ "$bandmode" = "6g" ] && [ "$now_encryption" = "$encryption" ]; then
 		return 0
 	fi
-	if [ "$bandmode" != "6g" ] && [ -n "$now_encryption" ] && [ "$now_encryption" != "none" ]; then
+	if [ "$bandmode" != "6g" ] && [ -n "$now_encryption" ] && [ "$now_encryption" != "none" ] &&
+		[ -n "$now_ssid" ] && [ "$now_ssid" != "OWRT" ]; then
 		return 0
 	fi
 	uci -q batch <<EOF
@@ -143,39 +161,49 @@ link_nn6000_wifi_cfg() {
 case "${board_name}" in
 jdcloud,ax1800-pro | \
 	jdcloud,re-ss-01)
+	ensure_wifi_config
 	jdc_ax1800_pro_wifi_cfg
 	;;
 jdcloud,ax6600 | \
 	jdcloud,re-cs-02)
+	ensure_wifi_config
 	jdc_ax6600_wifi_cfg
 	;;
 redmi,ax5 | \
 	redmi,ax5-jdcloud)
+	ensure_wifi_config
 	redmi_ax5_wifi_cfg
 	;;
 aliyun,ap8220)
+	ensure_wifi_config
 	aliyun_ap8220_wifi_cfg
 	;;
 cmcc,rax3000m)
+	ensure_wifi_config
 	cmcc_rax3000m_wifi_cfg
 	;;
 redmi,ax6 | \
 	redmi,ax6-stock)
+	ensure_wifi_config
 	redmi_ax6_wifi_cfg
 	;;
 qihoo,360v6)
+	ensure_wifi_config
 	qihoo_360v6_wifi_cfg
 	;;
 linksys,mx4200v1 | \
 	linksys,mx4200v2 | \
 	linksys,mx4300 | \
 	linksys,homewrk)
+	ensure_wifi_config
 	linksys_mx4x00_wifi_cfg
 	;;
 gemtek,w1701k-ubi)
+	ensure_wifi_config
 	gemtek_w1701k_wifi_cfg
 	;;
 link,nn6000-v2)
+	ensure_wifi_config
 	link_nn6000_wifi_cfg
 	;;
 *)

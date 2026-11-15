@@ -81,6 +81,7 @@ wrt_release/
 
 **配置片段目录**: `wrt_core/deconfig/fragments/`
 - `nss.config` - 高通 NSS 加速配置
+- `nss_nowifi.config` - 无 WiFi 版本的高通有线 NSS 加速配置
 - `docker_deps.config` - Docker 依赖配置
 - `proxy.config` - 代理配置
 
@@ -124,6 +125,7 @@ wrt_release/
 
 **配置片段**:
 - `nss.config` - 高通 NSS 加速配置
+- `nss_nowifi.config` - 无 WiFi 版本，仅保留有线 NSS 加速
 - `proxy.config` - 代理配置
 
 **未引入的片段**:
@@ -136,6 +138,13 @@ REPO_URL=https://github.com/VIKINGYFY/immortalwrt.git
 REPO_BRANCH=main
 BUILD_DIR=imm-nss
 CONFIG_FRAGMENTS=nss,proxy
+```
+
+无 WiFi 版本使用：
+
+```ini
+# jdcloud_ipq60xx_immwrt_nowifi_mini.ini
+CONFIG_FRAGMENTS=nss_nowifi,proxy
 ```
 
 ---
@@ -190,10 +199,60 @@ CONFIG_FRAGMENTS=nss,proxy
 #### 新增的配置文件
 - `jdcloud_ipq60xx_immwrt_nowifi_mini.config` - 无 WiFi 精简版配置
 - `jdcloud_ipq60xx_immwrt_mini.config` - 精简版配置
+- `wrt_core/deconfig/fragments/nss_nowifi.config` - 无 WiFi 有线 NSS 配置片段
+
+---
+
+### 5. 无 WiFi 与 WiFi 版本互刷
+
+两个版本通过各自的 `992` 初始化脚本处理无线配置：
+
+- **Nowifi_mini**: 安装 `992_remove-wifi-uci.sh`，首次启动时删除 `/etc/config/wireless`，包括 `radio0/radio1` 及其上配置的无线网络，然后重新加载网络。
+- **WiFi 版本**: 安装 `992_set-wifi-uci.sh`，执行 `/sbin/wifi config` 重新探测 Radio，并按设备型号自动填充 SSID、加密方式和 Radio 参数。
+- 使用 `sysupgrade` 保留配置时也支持互刷；无需强制使用 `-n` 清空全部配置。
+
+无 WiFi 版本仍保留 `rpcd-mod-iwinfo` 和 `ucode-mod-nl80211` 等 Vantage 运行依赖，但不会安装无线驱动、无线固件或 hostapd/wpa_supplicant，也不会生成无线配置。
+
+#### 无 WiFi 版本减少的软件包
+
+**减少软件包**: `ath11k-firmware-ipq6018-ddwrt`、`ath11k-firmware-qcn9074-ddwrt`、`ipq-wifi-*`
+- **作用**: 提供 ath11k 无线固件和设备无线校准数据
+- **移除原因**: 无 WiFi 版本不需要无线硬件初始化
+- **影响范围**: 无法启用或使用无线功能，不影响有线网络和 NSS 加速
+
+**减少软件包**: `wpad-mesh-openssl`、`hostapd-common`
+- **作用**: 提供 hostapd、wpa_supplicant 和无线接入/认证功能
+- **移除原因**: 无 WiFi 版本不需要无线接入和认证服务
+- **影响范围**: 无法创建无线 AP 或无线客户端，不影响 DHCP、路由、NAT、PPPoE
+
+**减少软件包**: `wifi-scripts`
+- **作用**: 提供无线 Radio 探测、UCI 初始化和 netifd 无线脚本
+- **移除原因**: 避免启动时重新生成 Radio 配置
+- **影响范围**: 无 WiFi 版本不提供无线配置生成；WiFi 版本继续保留该软件包
+
+#### 有线 NSS 保留项
+
+`nss_nowifi.config` 保留以下有线加速能力：
+
+- IPv4/IPv6 转发和 NAT 加速
+- PPPoE、PPTP、L2TPv2
+- Bridge、VLAN、LAG
+- NSS SQM、multicast snooping 和 SKB recycling
+
+仅移除 ATH11K、MAC80211 Mesh 和 WiFi NSS offload 相关配置。
 
 ---
 
 ## 变更记录
+
+### 2026-11-15：完善 Nowifi_mini 与 WiFi 互刷
+
+- 新增 `nss_nowifi.config`，无 WiFi 版本保留有线 NSS，移除无线 Mesh/WiFi offload 配置
+- 修正 Nowifi_mini 设备包配置，显式排除 ath11k 固件、ipq-wifi、wifi-scripts、wpad 和 hostapd
+- 新增 `992_remove-wifi-uci.sh`，刷入 Nowifi_mini 后清除旧的 `radio0/radio1` 和无线网络配置
+- 更新 `992_set-wifi-uci.sh`，刷回 WiFi 版本时自动重新探测并填充无线配置
+- 构建脚本向 `update.sh` 传递版本名称，使 no-WiFi 初始化脚本只进入 Nowifi_mini 固件
+- 保留 Vantage 所需的 `rpcd-mod-iwinfo` 与 `ucode-mod-nl80211` 运行依赖
 
 ### 2026-11-12：跟进 upstream/main
 
@@ -214,7 +273,9 @@ CONFIG_FRAGMENTS=nss,proxy
 
 ### Nowifi_mini 版本 (`jdcloud_ipq60xx_immwrt_nowifi_mini`)
 - **配置文件**: `wrt_core/deconfig/jdcloud_ipq60xx_immwrt_nowifi_mini.config`
-- **特点**: 移除所有无线相关驱动和固件，适合纯有线环境
+- **NSS 配置**: `wrt_core/deconfig/fragments/nss_nowifi.config`
+- **特点**: 移除无线驱动、固件、hostapd/wpa_supplicant 和无线配置生成，保留有线 NSS 加速，适合纯有线环境
+- **互刷行为**: 刷入时清除已有无线配置；刷回 WiFi 版本时自动重建并填充无线配置
 
 ### Mini 版本 (`jdcloud_ipq60xx_immwrt_mini`)
 - **配置文件**: `wrt_core/deconfig/jdcloud_ipq60xx_immwrt_mini.config`
