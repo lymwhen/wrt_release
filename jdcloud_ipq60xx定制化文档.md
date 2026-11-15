@@ -245,6 +245,14 @@ CONFIG_FRAGMENTS=nss_nowifi,proxy
 
 ## 变更记录
 
+### 2026-11-15：合并 upstream/main 63703f9
+
+- 合并上游 `545dfed` 与 `63703f9`，无冲突
+- x64 ImmortalWrt 构建分支由 `master` 调整为 `openwrt-25.12`
+- 更新 Vantage 源码完整性检查，增加主题运行时资源目录校验
+- 跟进 `luci-theme-vantage-bootstrap-migration.patch`，系统升级后自动修正残留的 Bootstrap 主题指针
+- 本次上游合并未增加或减少软件包
+
 ### 2026-11-15：完善 Nowifi_mini 与 WiFi 互刷
 
 - 新增 `nss_nowifi.config`，无 WiFi 版本保留有线 NSS，移除无线 Mesh/WiFi offload 配置
